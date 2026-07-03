@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{.Slave.Name}} — Cuttlefish Looking Glass</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="bg-neutral-50 text-neutral-900 min-h-screen">
+  <header class="border-b bg-white">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="/" class="text-xl font-semibold tracking-tight">Cuttlefish</a>
+      <nav class="text-sm text-neutral-500">
+        <a href="/" class="hover:text-neutral-900">Slaves</a>
+      </nav>
+    </div>
+  </header>
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <div class="space-y-6">
+      <div class="flex items-center gap-3">
+        <a href="/" class="text-sm text-neutral-500 hover:text-neutral-900">← Back</a>
+      </div>
+
+      <div class="rounded-xl border bg-white p-6 shadow-sm">
+        <div class="flex items-start justify-between">
+          <div>
+            <h1 class="text-2xl font-bold">{{.Slave.Name}}</h1>
+            <p class="text-neutral-500">{{.Slave.Location}}</p>
+          </div>
+          <a href="{{.Slave.PublicURL}}" target="_blank" class="text-sm text-blue-600 hover:underline">Direct link</a>
+        </div>
+
+        <div class="mt-6 grid gap-4 md:grid-cols-2">
+          <div class="rounded-lg border p-4">
+            <p class="text-sm text-neutral-500">IPv4</p>
+            <div class="mt-1 flex items-center justify-between">
+              <code class="font-mono text-lg" id="slave-ipv4">{{.Slave.IPv4}}</code>
+              <button onclick="copy('slave-ipv4')" class="text-xs px-2 py-1 rounded border hover:bg-neutral-50">Copy</button>
+            </div>
+          </div>
+          <div class="rounded-lg border p-4">
+            <p class="text-sm text-neutral-500">IPv6</p>
+            <div class="mt-1 flex items-center justify-between">
+              <code class="font-mono text-lg break-all" id="slave-ipv6">{{.Slave.IPv6}}</code>
+              <button onclick="copy('slave-ipv6')" class="text-xs px-2 py-1 rounded border hover:bg-neutral-50">Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid gap-6 lg:grid-cols-2">
+        <div class="rounded-xl border bg-white p-6 shadow-sm space-y-4">
+          <h2 class="text-lg font-semibold">Network tools</h2>
+          <div class="flex flex-wrap gap-2">
+            <input type="text" id="target" placeholder="example.com" class="flex-1 min-w-[12rem] rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="ipv6" class="rounded"> IPv6</label>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="runTool('ping')" class="px-4 py-2 rounded-lg bg-neutral-900 text-white text-sm hover:bg-neutral-800">Ping</button>
+            <button onclick="runTool('mtr')" class="px-4 py-2 rounded-lg bg-neutral-900 text-white text-sm hover:bg-neutral-800">MTR</button>
+            <button onclick="runTool('traceroute')" class="px-4 py-2 rounded-lg bg-neutral-900 text-white text-sm hover:bg-neutral-800">Traceroute</button>
+            <button onclick="runTool('iperf')" class="px-4 py-2 rounded-lg bg-neutral-900 text-white text-sm hover:bg-neutral-800">iPerf3</button>
+          </div>
+          <pre id="tool-output" class="rounded-lg bg-neutral-950 text-neutral-100 p-4 text-sm h-80 overflow-auto font-mono whitespace-pre-wrap"></pre>
+        </div>
+
+        <div class="rounded-xl border bg-white p-6 shadow-sm space-y-4">
+          <h2 class="text-lg font-semibold">Speed test files</h2>
+          <p class="text-sm text-neutral-500">Download test files served directly by this slave.</p>
+          <div class="grid grid-cols-2 gap-3">
+            {{range .Files}}
+            <a href="{{.URL}}" class="flex items-center justify-between rounded-lg border px-4 py-3 hover:bg-neutral-50">
+              <span class="font-mono text-sm">{{.Name}}</span>
+              <span class="text-xs text-neutral-500">{{.Size}}</span>
+            </a>
+            {{end}}
+          </div>
+
+          <div class="rounded-xl border bg-white p-6 shadow-sm space-y-4 mt-6">
+            <h2 class="text-lg font-semibold">Your IP</h2>
+            <div id="myip" class="space-y-2 text-sm">
+              <p><span class="text-neutral-500">IPv4</span> <span class="font-mono" id="my-ipv4">—</span></p>
+              <p><span class="text-neutral-500">IPv6</span> <span class="font-mono" id="my-ipv6">—</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+    const slaveId = {{.Slave.ID}};
+
+    function copy(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        const old = btn.innerText;
+        btn.innerText = 'Copied';
+        setTimeout(() => btn.innerText = old, 1000);
+      });
+    }
+
+    function runTool(tool) {
+      const target = document.getElementById('target').value.trim();
+      if (!target) {
+        alert('Enter a target host');
+        return;
+      }
+      const out = document.getElementById('tool-output');
+      out.textContent = `Running ${tool} ${target}...\n`;
+      const ipv6 = document.getElementById('ipv6').checked;
+      const params = new URLSearchParams({target, count: '4', timeout: '30'});
+      if (ipv6) params.set('ipv6', 'true');
+      const es = new EventSource('/api/slaves/' + slaveId + '/' + tool + '?' + params.toString());
+      es.addEventListener('result', e => {
+        const data = JSON.parse(e.data);
+        if (data.line) out.textContent += data.line;
+        if (data.error) out.textContent += 'ERROR: ' + data.error + '\n';
+        if (data.done) es.close();
+        out.scrollTop = out.scrollHeight;
+      });
+      es.onerror = () => es.close();
+    }
+
+    fetch('/api/myip')
+      .then(r => r.json())
+      .then(data => {
+        if (data.ipv4) document.getElementById('my-ipv4').textContent = data.ipv4;
+        if (data.ipv6) document.getElementById('my-ipv6').textContent = data.ipv6;
+      });
+    </script>
+  </main>
+  <footer class="border-t bg-white mt-auto">
+    <div class="max-w-6xl mx-auto px-4 py-6 text-sm text-neutral-500">
+      Open-source Looking Glass · <a href="https://github.com/trusted-technologies/cuttlefish" class="underline hover:text-neutral-900">GitHub</a>
+    </div>
+  </footer>
+</body>
+</html>

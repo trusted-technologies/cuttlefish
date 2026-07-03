@@ -1,0 +1,27 @@
+# syntax=docker/dockerfile:1
+FROM golang:1.24-bookworm AS builder
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o /bin/slave ./cmd/slave
+
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    iputils-ping \
+    mtr \
+    traceroute \
+    iperf3 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Allow non-root users to run ping/mtr/traceroute.
+RUN setcap cap_net_raw+ep /usr/bin/ping || true && \
+    chmod u+s /usr/bin/mtr-packet || true && \
+    chmod u+s /usr/sbin/traceroute || true
+
+RUN mkdir -p /data/files
+COPY --from=builder /bin/slave /usr/local/bin/cuttlefish-slave
+EXPOSE 8080
+VOLUME ["/data/files"]
+ENTRYPOINT ["/usr/local/bin/cuttlefish-slave"]

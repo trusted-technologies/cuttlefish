@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slaves — Cuttlefish Looking Glass</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="bg-neutral-50 text-neutral-900 min-h-screen">
+  <header class="border-b bg-white">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="/" class="text-xl font-semibold tracking-tight">Cuttlefish</a>
+      <nav class="text-sm text-neutral-500">
+        <a href="/" class="hover:text-neutral-900">Slaves</a>
+      </nav>
+    </div>
+  </header>
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <div class="space-y-6">
+      <div class="flex items-center justify-between">
+        <h1 class="text-3xl font-bold">Network nodes</h1>
+        <span class="text-sm text-neutral-500">{{len .Slaves}} registered</span>
+      </div>
+
+      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3" id="slave-grid">
+        {{range .Slaves}}
+        <a href="/slave/{{.ID}}" class="block rounded-xl border bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex items-start justify-between">
+            <div>
+              <h2 class="font-semibold text-lg">{{.Name}}</h2>
+              <p class="text-sm text-neutral-500">{{.Location}}</p>
+            </div>
+            <span class="inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+          </div>
+          <div class="mt-4 space-y-1 text-sm">
+            {{if .IPv4}}<p><span class="text-neutral-400">IPv4</span> <span class="font-mono ml-1">{{.IPv4}}</span></p>{{end}}
+            {{if .IPv6}}<p><span class="text-neutral-400">IPv6</span> <span class="font-mono ml-1">{{.IPv6}}</span></p>{{end}}
+          </div>
+        </a>
+        {{else}}
+        <div class="col-span-full rounded-xl border border-dashed bg-white p-10 text-center text-neutral-500">
+          No slaves registered yet. Start a slave with the same <code class="bg-neutral-100 px-1 rounded">MASTER_TOKEN</code> and point it to this master.
+        </div>
+        {{end}}
+      </div>
+    </div>
+  </main>
+  <footer class="border-t bg-white mt-auto">
+    <div class="max-w-6xl mx-auto px-4 py-6 text-sm text-neutral-500">
+      Open-source Looking Glass · <a href="https://github.com/trusted-technologies/cuttlefish" class="underline hover:text-neutral-900">GitHub</a>
+    </div>
+  </footer>
+</body>
+</html>

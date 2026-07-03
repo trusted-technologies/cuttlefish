@@ -1,0 +1,38 @@
+services:
+  master:
+    build:
+      context: .
+      dockerfile: Dockerfile.master
+    container_name: cuttlefish-master
+    ports:
+      - "8080:8080"
+    environment:
+      MASTER_ADDR: ":8080"
+      MASTER_TOKEN: "${MASTER_TOKEN:-change-me-in-production}"
+    networks:
+      - cuttlefish
+
+  slave:
+    build:
+      context: .
+      dockerfile: Dockerfile.slave
+    container_name: cuttlefish-slave
+    environment:
+      SLAVE_ID: "local-slave"
+      SLAVE_NAME: "Local Test Slave"
+      SLAVE_PUBLIC_URL: "http://slave:8080"
+      MASTER_URL: "http://master:8080"
+      SLAVE_TOKEN: "${MASTER_TOKEN:-change-me-in-production}"
+      SLAVE_LOCATION: "Docker local"
+      SLAVE_ADDR: ":8080"
+      FILES_DIR: "/data/files"
+    cap_add:
+      - NET_RAW
+    networks:
+      - cuttlefish
+    depends_on:
+      - master
+
+networks:
+  cuttlefish:
+    driver: bridge
