@@ -29,17 +29,9 @@ The installer is interactive. It installs Docker, generates tokens, optionally s
 sudo bash -c "$(curl -sSL https://raw.githubusercontent.com/trusted-technologies/cuttlefish/main/scripts/install.sh)"
 ```
 
-## Quick update
+## Update or uninstall
 
-```bash
-sudo bash -c "$(curl -sSL https://raw.githubusercontent.com/trusted-technologies/cuttlefish/main/scripts/update.sh)"
-```
-
-## Quick uninstall
-
-```bash
-sudo bash -c "$(curl -sSL https://raw.githubusercontent.com/trusted-technologies/cuttlefish/main/scripts/uninstall.sh)"
-```
+Run the same installer again and choose **Update existing installation** or **Uninstall** from the menu.
 
 ## Full installation guide
 

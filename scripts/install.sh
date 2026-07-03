@@ -80,7 +80,7 @@ generate_token() {
 detect_public_ipv4() {
     local ip=""
     if command -v curl >/dev/null 2>&1; then
-        ip=$(curl -4s --max-time 5 https://ifconfig.me 2>/dev/null || true)
+        ip=$(curl -4s --connect-timeout 3 --max-time 5 https://ifconfig.me 2>/dev/null || true)
     fi
     if [[ -z $ip ]] && command -v wget >/dev/null 2>&1; then
         ip=$(wget -qO- --timeout=5 https://ifconfig.me 2>/dev/null || true)
@@ -91,10 +91,21 @@ detect_public_ipv4() {
 detect_public_ipv6() {
     local ip=""
     if command -v curl >/dev/null 2>&1; then
-        ip=$(curl -6s --max-time 5 https://ifconfig.me 2>/dev/null || true)
+        ip=$(curl -6s --connect-timeout 3 --max-time 5 https://ifconfig.me 2>/dev/null || true)
     fi
     if [[ -z $ip ]] && command -v wget >/dev/null 2>&1; then
         ip=$(wget -qO- --timeout=5 -6 https://ifconfig.me 2>/dev/null || true)
+    fi
+    echo "$ip"
+}
+
+ask_ip() {
+    local family="$1"
+    local detect_fn="$2"
+    local ip=""
+    if ask_yesno "Does this slave have a public ${family} address?" "y"; then
+        ip=$($detect_fn)
+        ip=$(ask "Public ${family}" "$ip")
     fi
     echo "$ip"
 }
@@ -345,17 +356,16 @@ install_slave() {
     slave_name=$(ask "Slave display name" "$slave_id")
     location=$(ask "Slave location" "Unknown")
 
-    ipv4=$(detect_public_ipv4)
-    ipv4=$(ask "Public IPv4" "$ipv4")
+    ipv4=$(ask_ip "IPv4" detect_public_ipv4)
+    ipv6=$(ask_ip "IPv6" detect_public_ipv6)
 
-    ipv6=$(detect_public_ipv6)
-    if [[ -n $ipv6 ]]; then
-        ipv6=$(ask "Public IPv6 (leave empty if none)" "$ipv6")
+    local public_url_default
+    if [[ -n $ipv4 ]]; then
+        public_url_default="http://${ipv4}:8080"
     else
-        ipv6=$(ask "Public IPv6 (leave empty if none)")
+        public_url_default="http://$(hostname -f 2>/dev/null || hostname):8080"
     fi
-
-    public_url=$(ask "Public URL for this slave" "http://${ipv4}:8080")
+    public_url=$(ask "Public URL for this slave" "$public_url_default")
     local public_port
     public_port=$(parse_url_port "$public_url" 8080)
     iperf_port=$(ask "iPerf3 server port" "5201")

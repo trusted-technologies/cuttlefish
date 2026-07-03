@@ -43,24 +43,14 @@ sudo bash /tmp/cuttlefish-install.sh
 - For a **master**: generates a `MASTER_TOKEN`, starts the master container, and optionally installs Nginx with Let's Encrypt or self-signed SSL.
 - For a **slave**: asks for the master URL and token, detects the public IP, starts the slave container with `iperf3`, and lets you choose which test file sizes to keep.
 
-### Helper scripts
+### Update / reinstall / uninstall
 
-After installation, use the helper scripts in `/opt/cuttlefish`:
-
-```bash
-sudo /opt/cuttlefish/update.sh      # pull latest images and recreate containers
-sudo /opt/cuttlefish/reinstall.sh   # reconfigure and reinstall
-sudo /opt/cuttlefish/uninstall.sh   # remove containers, volumes and config
-```
-
-You can also run the installer with a subcommand directly:
+Run the installer again and pick the matching menu option, or use a subcommand:
 
 ```bash
-sudo bash install.sh master      # install master
-sudo bash install.sh slave       # install slave
-sudo bash install.sh update      # update
-sudo bash install.sh reinstall   # reconfigure
-sudo bash install.sh uninstall   # uninstall
+sudo bash install.sh update      # pull latest images and recreate containers
+sudo bash install.sh reinstall   # reconfigure and reinstall
+sudo bash install.sh uninstall   # remove containers, volumes and config
 ```
 
 ## Quick start (Docker Compose)
