@@ -38,13 +38,11 @@
 
       <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3" id="slave-grid">
         {{range .Slaves}}
-        <a href="/slave/{{.ID}}" class="block p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 transition-colors">
-          <div class="flex items-start justify-between mb-4">
-            <div>
-              <h2 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">{{.Name}}</h2>
-              <p class="text-sm text-gray-500 dark:text-gray-400">{{.Location}}</p>
-            </div>
-            <span class="inline-flex h-2.5 w-2.5 rounded-full bg-green-500"></span>
+        <a href="/slave/{{.ID}}" class="relative block p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 transition-colors">
+          <span class="absolute top-5 right-5 inline-flex h-2.5 w-2.5 rounded-full bg-green-500"></span>
+          <div class="mb-4 pr-5">
+            <h2 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">{{.Name}}</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{.Location}}</p>
           </div>
           <div class="space-y-2 text-sm">
             {{if .IPv4}}
