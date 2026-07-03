@@ -10,6 +10,16 @@ An open-source **Looking Glass** with a **master/slave** architecture, written i
 - Test files: 1M, 10M, 100M, 1G, 10G, 100G.
 - Ready-to-use images built via GitHub Actions and published to GHCR.
 
+## Demo
+
+A live Looking Glass demo is available as the ApexNodes hosting page: https://cuttlefish.apexnodes.xyz/
+
+### Screenshots
+
+![Slaves list](assets/slaves.png)
+
+![Slave details](assets/slave.png)
+
 ## Architecture
 
 - **Master** — web server and slave registry.
