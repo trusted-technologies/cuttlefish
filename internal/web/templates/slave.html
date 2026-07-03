@@ -100,22 +100,30 @@
           <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 space-y-4">
             <h2 class="text-xl font-bold text-gray-900 dark:text-white">iPerf3 to this node</h2>
             <p class="text-sm text-gray-500 dark:text-gray-400">Run these from your machine against this node.</p>
-            <div class="space-y-3">
+            <div class="space-y-4">
               {{if .Slave.IPv4}}
-              <div>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">IPv4</p>
+              <div class="space-y-2">
+                <p class="text-xs font-medium text-gray-500 dark:text-gray-400">IPv4</p>
                 <div class="flex items-center justify-between gap-3 p-3 bg-gray-900 border border-gray-700 rounded-lg">
-                  <code class="font-mono text-sm text-green-400 break-all" id="iperf-ipv4">iperf3 -4 -c {{.Slave.IPv4}} -p {{.Slave.IperfPort}} -P 4</code>
-                  <button onclick="copy('iperf-ipv4')" class="text-xs px-3 py-1.5 font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700 shrink-0">Copy</button>
+                  <code class="font-mono text-sm text-green-400 break-all" id="iperf-ipv4-in">iperf3 -4 -c {{.Slave.IPv4}} -p {{.Slave.IperfPort}} -P 4</code>
+                  <button onclick="copy('iperf-ipv4-in')" class="text-xs px-3 py-1.5 font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700 shrink-0">Copy</button>
+                </div>
+                <div class="flex items-center justify-between gap-3 p-3 bg-gray-900 border border-gray-700 rounded-lg">
+                  <code class="font-mono text-sm text-green-400 break-all" id="iperf-ipv4-out">iperf3 -4 -c {{.Slave.IPv4}} -p {{.Slave.IperfPort}} -P 4 -R</code>
+                  <button onclick="copy('iperf-ipv4-out')" class="text-xs px-3 py-1.5 font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700 shrink-0">Copy</button>
                 </div>
               </div>
               {{end}}
               {{if .Slave.IPv6}}
-              <div>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">IPv6</p>
+              <div class="space-y-2">
+                <p class="text-xs font-medium text-gray-500 dark:text-gray-400">IPv6</p>
                 <div class="flex items-center justify-between gap-3 p-3 bg-gray-900 border border-gray-700 rounded-lg">
-                  <code class="font-mono text-sm text-green-400 break-all" id="iperf-ipv6">iperf3 -6 -c {{.Slave.IPv6}} -p {{.Slave.IperfPort}} -P 4</code>
-                  <button onclick="copy('iperf-ipv6')" class="text-xs px-3 py-1.5 font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700 shrink-0">Copy</button>
+                  <code class="font-mono text-sm text-green-400 break-all" id="iperf-ipv6-in">iperf3 -6 -c {{.Slave.IPv6}} -p {{.Slave.IperfPort}} -P 4</code>
+                  <button onclick="copy('iperf-ipv6-in')" class="text-xs px-3 py-1.5 font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700 shrink-0">Copy</button>
+                </div>
+                <div class="flex items-center justify-between gap-3 p-3 bg-gray-900 border border-gray-700 rounded-lg">
+                  <code class="font-mono text-sm text-green-400 break-all" id="iperf-ipv6-out">iperf3 -6 -c {{.Slave.IPv6}} -p {{.Slave.IperfPort}} -P 4 -R</code>
+                  <button onclick="copy('iperf-ipv6-out')" class="text-xs px-3 py-1.5 font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700 shrink-0">Copy</button>
                 </div>
               </div>
               {{end}}
