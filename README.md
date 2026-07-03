@@ -20,6 +20,49 @@ A live Looking Glass demo is available as the ApexNodes hosting page: https://cu
 
 ![Slave details](assets/slave.png)
 
+## Quick install with the interactive installer
+
+The easiest way to deploy Cuttlefish is using the bash installer. It installs Docker, generates tokens, optionally sets up Nginx with SSL, and configures the master or slave for you.
+
+```bash
+# Clone the repo and run the installer
+git clone https://github.com/trusted-technologies/cuttlefish.git
+cd cuttlefish/scripts
+sudo bash install.sh
+```
+
+Or download just the installer:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/trusted-technologies/cuttlefish/main/scripts/install.sh | sudo bash
+```
+
+### What the installer does
+
+- Installs Docker if it is not already present.
+- For a **master**: generates a `MASTER_TOKEN`, starts the master container, and optionally installs Nginx with Let's Encrypt or self-signed SSL.
+- For a **slave**: asks for the master URL and token, detects the public IP, starts the slave container with `iperf3`, and lets you choose which test file sizes to keep.
+
+### Helper scripts
+
+After installation, use the helper scripts in `/opt/cuttlefish` (or `scripts/`):
+
+```bash
+sudo bash scripts/update.sh      # pull latest images and recreate containers
+sudo bash scripts/reinstall.sh   # reconfigure and reinstall
+sudo bash scripts/uninstall.sh   # remove containers, volumes and config
+```
+
+You can also run the installer with a subcommand directly:
+
+```bash
+sudo bash install.sh master      # install master
+sudo bash install.sh slave       # install slave
+sudo bash install.sh update      # update
+sudo bash install.sh reinstall   # reconfigure
+sudo bash install.sh uninstall   # uninstall
+```
+
 ## Architecture
 
 - **Master** — web server and slave registry.
