@@ -77,7 +77,7 @@ func (m *Master) Run(ctx context.Context) error {
 }
 
 func (m *Master) handleSPA(w http.ResponseWriter, r *http.Request) {
-	f, err := staticFS.Open("static/index.html")
+	f, err := staticFS.Open("index.html")
 	if err != nil {
 		http.NotFound(w, r)
 		return

@@ -1,7 +1,15 @@
 package master
 
-import "github.com/trusted-technologies/cuttlefish/internal/web"
+import (
+	"io/fs"
+
+	"github.com/trusted-technologies/cuttlefish/internal/web"
+)
 
 func init() {
-	staticFS = web.StaticFS
+	var err error
+	staticFS, err = fs.Sub(web.StaticFS, "static")
+	if err != nil {
+		panic(err)
+	}
 }
