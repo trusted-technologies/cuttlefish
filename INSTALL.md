@@ -221,6 +221,25 @@ By default the slave creates `1M`, `10M`, `100M`, `1G`, `10G` and `100G` test fi
 
 Only the listed sizes are created on disk and shown in the UI.
 
+## Real-time traffic charts
+
+Each slave page can show live RX/TX area charts for selected network interfaces. The slave reads `/sys/class/net/<iface>/statistics/rx_bytes` and `tx_bytes` every second and streams the data to the UI through Server-Sent Events.
+
+### Choose interfaces to monitor
+
+By default the slave tries to auto-detect a usable interface (skipping `lo`). To monitor specific interfaces, set `STATS_INTERFACES`:
+
+```bash
+-e STATS_INTERFACES="eth0,eth1"
+```
+
+Leave it unset to let the slave pick the first non-loopback interface it finds.
+
+### Requirements
+
+- The container must be able to read `/sys/class/net`. This works on most Linux hosts without extra privileges.
+- If the `/sys` path is not available inside the container, charts show a fallback message and no data is collected.
+
 ## Environment variables
 
 ### Master

@@ -7,6 +7,7 @@ An open-source **Looking Glass** with a **master/slave** architecture, written i
 - Web UI in the style of shadcn (Tailwind CSS).
 - Master and Slave written in Go, packaged in separate Docker images.
 - Streaming command output via Server-Sent Events.
+- Real-time network interface traffic charts (RX/TX area charts).
 - Test files: 1M, 10M, 100M, 1G, 10G, 100G (configurable).
 - Ready-to-use images built via GitHub Actions and published to GHCR.
 
