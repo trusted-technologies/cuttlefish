@@ -144,6 +144,16 @@ docker run -d \
 >
 > The slave auto-detects its IP addresses, but inside Docker it usually sees the container IP (e.g. `172.17.0.2`). Set `SLAVE_IPV4`/`SLAVE_IPV6` to show the real public addresses in the UI.
 
+### Limiting test file sizes
+
+By default the slave creates `1M`, `10M`, `100M`, `1G`, `10G` and `100G` test files. To skip the larger ones, set `FILES_SIZES`:
+
+```bash
+-e FILES_SIZES="1M,10M,100M,1G"
+```
+
+Only the listed sizes are created on disk and shown in the UI.
+
 ### Docker Compose for the slave
 
 ```yaml
@@ -200,6 +210,7 @@ docker compose up -d
 | `SLAVE_ADDR`       | Listen address                              | `:8080`       |
 | `IPERF_PORT`       | iperf3 server port                          | `5201`        |
 | `FILES_DIR`        | Directory for test files                    | `/data/files` |
+| `FILES_SIZES`      | Comma-separated test file sizes to serve    | `1M,10M,...`  |
 
 ## Building from source
 

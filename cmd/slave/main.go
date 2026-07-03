@@ -25,6 +25,19 @@ func main() {
 	flag.StringVar(&cfg.HTTPAddr, "addr", shared.EnvDefault("SLAVE_ADDR", ":8080"), "HTTP listen address")
 	flag.StringVar(&cfg.IperfPort, "iperf-port", shared.EnvDefault("IPERF_PORT", "5201"), "iperf3 server port")
 	flag.StringVar(&cfg.FilesDir, "files-dir", shared.EnvDefault("FILES_DIR", "/data/files"), "directory for test files")
+	flag.Func("files-sizes", "comma-separated test file sizes (e.g. 1M,10M,100M,1G)", func(s string) error {
+		var err error
+		cfg.FileSizes, err = shared.ParseFileSizesList(s)
+		return err
+	})
+	if s := shared.EnvDefault("FILES_SIZES", ""); s != "" {
+		sizes, err := shared.ParseFileSizesList(s)
+		if err != nil {
+			slog.Error("invalid FILES_SIZES", "error", err)
+			os.Exit(1)
+		}
+		cfg.FileSizes = sizes
+	}
 	flag.Parse()
 
 	if cfg.ID == "" {

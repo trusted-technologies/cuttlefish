@@ -100,7 +100,7 @@ func (m *Master) handleSlavePage(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	files := shared.TestFiles(s.PublicURL)
+	files := shared.TestFiles(s.PublicURL, s.FileSizes)
 	data := map[string]any{
 		"Slave": s,
 		"Files": files,
@@ -196,7 +196,7 @@ func (m *Master) proxyCommand(w http.ResponseWriter, r *http.Request, s *shared.
 }
 
 func (m *Master) proxyFiles(w http.ResponseWriter, r *http.Request, s *shared.SlaveInfo) {
-	files := shared.TestFiles(s.PublicURL)
+	files := shared.TestFiles(s.PublicURL, s.FileSizes)
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(files)
 }
@@ -224,6 +224,7 @@ func (m *Master) handleRegister(w http.ResponseWriter, r *http.Request) {
 		IPv6:      req.IPv6,
 		Location:  req.Location,
 		IperfPort: iperfPort,
+		FileSizes: req.FileSizes,
 		LastSeen:  time.Now(),
 	}
 	m.mu.Unlock()

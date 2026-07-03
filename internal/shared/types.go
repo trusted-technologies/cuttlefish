@@ -11,6 +11,7 @@ type SlaveInfo struct {
 	IPv6      string    `json:"ipv6"`
 	Location  string    `json:"location"`
 	IperfPort string    `json:"iperf_port"`
+	FileSizes []string  `json:"file_sizes,omitempty"`
 	LastSeen  time.Time `json:"last_seen"`
 }
 
@@ -37,14 +38,15 @@ type MyIPInfo struct {
 
 // RegisterRequest is sent by a slave to register with the master.
 type RegisterRequest struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	PublicURL string `json:"public_url"`
-	Token     string `json:"token"`
-	IPv4      string `json:"ipv4"`
-	IPv6      string `json:"ipv6"`
-	Location  string `json:"location"`
-	IperfPort string `json:"iperf_port"`
+	ID        string   `json:"id"`
+	Name      string   `json:"name"`
+	PublicURL string   `json:"public_url"`
+	Token     string   `json:"token"`
+	IPv4      string   `json:"ipv4"`
+	IPv6      string   `json:"ipv6"`
+	Location  string   `json:"location"`
+	IperfPort string   `json:"iperf_port"`
+	FileSizes []string `json:"file_sizes,omitempty"`
 }
 
 // HeartbeatRequest is sent periodically by a slave.

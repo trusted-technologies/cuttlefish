@@ -24,6 +24,7 @@ type Config struct {
 	Location  string
 	HTTPAddr  string
 	IperfPort string
+	FileSizes []string
 	FilesDir  string
 }
 
@@ -39,7 +40,7 @@ func New(cfg Config) *Slave {
 
 // Run starts the slave: registers with master, starts heartbeat, and serves HTTP.
 func (s *Slave) Run(ctx context.Context) error {
-	if err := EnsureTestFiles(s.cfg.FilesDir); err != nil {
+	if err := EnsureTestFiles(s.cfg.FilesDir, shared.FilterFileSizes(s.cfg.FileSizes)); err != nil {
 		return fmt.Errorf("ensure test files: %w", err)
 	}
 
@@ -110,7 +111,7 @@ func (s *Slave) handleInfo(w http.ResponseWriter, r *http.Request) {
 
 func (s *Slave) handleFiles(w http.ResponseWriter, r *http.Request) {
 	sizeName := r.URL.Path[len("/files/"):]
-	ServeFile(w, r, sizeName, s.cfg.FilesDir)
+	ServeFile(w, r, sizeName, s.cfg.FilesDir, shared.FilterFileSizes(s.cfg.FileSizes))
 }
 
 // getIPs returns the configured public IPs or auto-detected ones.
@@ -136,6 +137,7 @@ func (s *Slave) register(ctx context.Context) error {
 		IPv6:      ipv6,
 		Location:  s.cfg.Location,
 		IperfPort: s.cfg.IperfPort,
+		FileSizes: s.cfg.FileSizes,
 	}
 	return s.postJSON(ctx, s.cfg.MasterURL+"/internal/register", reqBody)
 }

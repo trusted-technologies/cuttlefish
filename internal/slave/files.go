@@ -12,11 +12,15 @@ import (
 )
 
 // EnsureTestFiles creates test files in dir if they do not exist.
-func EnsureTestFiles(dir string) error {
+// Only sizes listed in sizes are created; an empty slice uses all defaults.
+func EnsureTestFiles(dir string, sizes []shared.FileSize) error {
+	if len(sizes) == 0 {
+		sizes = shared.DefaultFileSizes
+	}
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return err
 	}
-	for _, fs := range shared.FileSizes {
+	for _, fs := range sizes {
 		path := filepath.Join(dir, fs.Name+".bin")
 		if _, err := os.Stat(path); err == nil {
 			continue
@@ -54,11 +58,15 @@ func createFile(path string, size int64) error {
 	return nil
 }
 
-// ParseFileSize parses "1M", "10M", "100M", "1G", "10G", "100G" into bytes.
-func ParseFileSize(s string) (int64, error) {
+// ParseFileSize parses a file size name into bytes using the allowed sizes.
+// An empty allowed slice uses all default sizes.
+func ParseFileSize(s string, allowed []shared.FileSize) (int64, error) {
 	s = strings.ToUpper(strings.TrimSpace(s))
 	s = strings.TrimSuffix(s, ".BIN")
-	for _, fs := range shared.FileSizes {
+	if len(allowed) == 0 {
+		allowed = shared.DefaultFileSizes
+	}
+	for _, fs := range allowed {
 		if s == fs.Name {
 			return fs.Size, nil
 		}
@@ -67,8 +75,9 @@ func ParseFileSize(s string) (int64, error) {
 }
 
 // ServeFile streams a test file of the requested size.
-func ServeFile(w http.ResponseWriter, r *http.Request, sizeName, dir string) {
-	size, err := ParseFileSize(sizeName)
+// Only sizes listed in allowed are served; an empty slice allows all defaults.
+func ServeFile(w http.ResponseWriter, r *http.Request, sizeName, dir string, allowed []shared.FileSize) {
+	size, err := ParseFileSize(sizeName, allowed)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

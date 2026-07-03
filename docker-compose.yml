@@ -30,6 +30,8 @@ services:
       SLAVE_ADDR: ":8080"
       IPERF_PORT: "5201"
       FILES_DIR: "/data/files"
+      # Optional: limit test file sizes, e.g. "1M,10M,100M,1G"
+      FILES_SIZES: "${FILES_SIZES:-}"
     cap_add:
       - NET_RAW
     networks:
