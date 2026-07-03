@@ -1,5 +1,0 @@
-/* Minimal overrides on top of Tailwind. */
-pre {
-  scrollbar-width: thin;
-  scrollbar-color: #404040 #0a0a0a;
-}

@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/trusted-technologies/cuttlefish/internal/shared"
@@ -25,6 +26,14 @@ func main() {
 	flag.StringVar(&cfg.HTTPAddr, "addr", shared.EnvDefault("SLAVE_ADDR", ":8080"), "HTTP listen address")
 	flag.StringVar(&cfg.IperfPort, "iperf-port", shared.EnvDefault("IPERF_PORT", "5201"), "iperf3 server port")
 	flag.StringVar(&cfg.FilesDir, "files-dir", shared.EnvDefault("FILES_DIR", "/data/files"), "directory for test files")
+	flag.Func("stats-interfaces", "comma-separated network interfaces to monitor (e.g. eth0,ens18)", func(s string) error {
+		cfg.StatsInterfaces = splitTrim(s)
+		return nil
+	})
+	if s := shared.EnvDefault("STATS_INTERFACES", ""); s != "" {
+		cfg.StatsInterfaces = splitTrim(s)
+	}
+
 	flag.Func("files-sizes", "comma-separated test file sizes (e.g. 1M,10M,100M,1G)", func(s string) error {
 		var err error
 		cfg.FileSizes, err = shared.ParseFileSizesList(s)
@@ -60,4 +69,19 @@ func main() {
 		slog.Error("slave failed", "error", err)
 		os.Exit(1)
 	}
+}
+
+func splitTrim(s string) []string {
+	if strings.TrimSpace(s) == "" {
+		return nil
+	}
+	parts := strings.Split(s, ",")
+	out := make([]string, 0, len(parts))
+	for _, p := range parts {
+		p = strings.TrimSpace(p)
+		if p != "" {
+			out = append(out, p)
+		}
+	}
+	return out
 }

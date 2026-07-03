@@ -18,16 +18,10 @@ func main() {
 	flag.StringVar(&cfg.Token, "token", shared.EnvDefault("MASTER_TOKEN", ""), "shared secret required from slaves")
 	flag.Parse()
 
-	templates, err := master.LoadTemplates()
-	if err != nil {
-		slog.Error("failed to load templates", "error", err)
-		os.Exit(1)
-	}
-
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	m := master.New(cfg, templates)
+	m := master.New(cfg)
 	if err := m.Run(ctx); err != nil {
 		slog.Error("master failed", "error", err)
 		os.Exit(1)

@@ -14,18 +14,19 @@ import (
 
 // Config holds slave configuration.
 type Config struct {
-	ID        string
-	Name      string
-	PublicURL string
-	IPv4      string
-	IPv6      string
-	MasterURL string
-	Token     string
-	Location  string
-	HTTPAddr  string
-	IperfPort string
-	FileSizes []string
-	FilesDir  string
+	ID              string
+	Name            string
+	PublicURL       string
+	IPv4            string
+	IPv6            string
+	MasterURL       string
+	Token           string
+	Location        string
+	HTTPAddr        string
+	IperfPort       string
+	FileSizes       []string
+	StatsInterfaces []string
+	FilesDir        string
 }
 
 // Slave represents a running slave agent.
@@ -51,6 +52,7 @@ func (s *Slave) Run(ctx context.Context) error {
 	mux.HandleFunc("/exec/mtr", func(w http.ResponseWriter, r *http.Request) { HandleExec(w, r, "mtr") })
 	mux.HandleFunc("/exec/traceroute", func(w http.ResponseWriter, r *http.Request) { HandleExec(w, r, "traceroute") })
 	mux.HandleFunc("/exec/iperf", func(w http.ResponseWriter, r *http.Request) { HandleExec(w, r, "iperf") })
+	mux.HandleFunc("/stats", s.handleStats)
 	mux.HandleFunc("/files/", s.handleFiles)
 
 	srv := &http.Server{

@@ -3,6 +3,10 @@
 /dist/
 *.exe
 
+# Node
+node_modules/
+*.local
+
 # Test files generated during development
 /tmp/
 /data/files/

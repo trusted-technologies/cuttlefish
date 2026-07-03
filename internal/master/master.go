@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"io"
 	"io/fs"
 	"log/slog"
@@ -20,6 +19,7 @@ import (
 
 func init() {
 	_ = mime.AddExtensionType(".css", "text/css; charset=utf-8")
+	_ = mime.AddExtensionType(".js", "application/javascript; charset=utf-8")
 }
 
 // Config holds master configuration.
@@ -30,32 +30,29 @@ type Config struct {
 
 // Master is the looking-glass master server.
 type Master struct {
-	cfg       Config
-	slaves    map[string]*shared.SlaveInfo
-	mu        sync.RWMutex
-	templates *template.Template
+	cfg    Config
+	slaves map[string]*shared.SlaveInfo
+	mu     sync.RWMutex
 }
 
 // New creates a new master server.
-func New(cfg Config, templates *template.Template) *Master {
+func New(cfg Config) *Master {
 	return &Master{
-		cfg:       cfg,
-		slaves:    make(map[string]*shared.SlaveInfo),
-		templates: templates,
+		cfg:    cfg,
+		slaves: make(map[string]*shared.SlaveInfo),
 	}
 }
 
 // Run starts the HTTP server.
 func (m *Master) Run(ctx context.Context) error {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", m.handleIndex)
-	mux.HandleFunc("/slave/", m.handleSlavePage)
 	mux.HandleFunc("/api/myip", m.handleMyIP)
 	mux.HandleFunc("/api/slaves", m.handleListSlaves)
 	mux.HandleFunc("/api/slaves/", m.handleSlaveAPI)
 	mux.HandleFunc("/internal/register", m.handleRegister)
 	mux.HandleFunc("/internal/heartbeat", m.handleHeartbeat)
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(staticFS))))
+	mux.HandleFunc("/", m.handleSPA)
 
 	srv := &http.Server{
 		Addr:    m.cfg.HTTPAddr,
@@ -79,36 +76,15 @@ func (m *Master) Run(ctx context.Context) error {
 	}
 }
 
-func (m *Master) handleIndex(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
+func (m *Master) handleSPA(w http.ResponseWriter, r *http.Request) {
+	f, err := staticFS.Open("static/index.html")
+	if err != nil {
 		http.NotFound(w, r)
 		return
 	}
-	data := m.slaveListData()
-	if err := m.templates.ExecuteTemplate(w, "index.html", data); err != nil {
-		slog.Error("template error", "error", err)
-		return
-	}
-}
-
-func (m *Master) handleSlavePage(w http.ResponseWriter, r *http.Request) {
-	id := strings.TrimPrefix(r.URL.Path, "/slave/")
-	m.mu.RLock()
-	s, ok := m.slaves[id]
-	m.mu.RUnlock()
-	if !ok {
-		http.NotFound(w, r)
-		return
-	}
-	files := shared.TestFiles(s.PublicURL, s.FileSizes)
-	data := map[string]any{
-		"Slave": s,
-		"Files": files,
-	}
-	if err := m.templates.ExecuteTemplate(w, "slave.html", data); err != nil {
-		slog.Error("template error", "error", err)
-		return
-	}
+	defer f.Close()
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	_, _ = io.Copy(w, f)
 }
 
 func (m *Master) handleMyIP(w http.ResponseWriter, r *http.Request) {
@@ -157,6 +133,8 @@ func (m *Master) handleSlaveAPI(w http.ResponseWriter, r *http.Request) {
 		m.proxyCommand(w, r, s, action)
 	case "files":
 		m.proxyFiles(w, r, s)
+	case "stats":
+		m.proxyStats(w, r, s)
 	default:
 		http.NotFound(w, r)
 	}
@@ -199,6 +177,28 @@ func (m *Master) proxyFiles(w http.ResponseWriter, r *http.Request, s *shared.Sl
 	files := shared.TestFiles(s.PublicURL, s.FileSizes)
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(files)
+}
+
+func (m *Master) proxyStats(w http.ResponseWriter, r *http.Request, s *shared.SlaveInfo) {
+	req, err := http.NewRequestWithContext(r.Context(), http.MethodGet, s.PublicURL+"/stats", nil)
+	if err != nil {
+		http.Error(w, "failed to build request: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		http.Error(w, "failed to reach slave: "+err.Error(), http.StatusBadGateway)
+		return
+	}
+	defer resp.Body.Close()
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+	w.WriteHeader(resp.StatusCode)
+	io.Copy(w, resp.Body)
+	if f, ok := w.(http.Flusher); ok {
+		f.Flush()
+	}
 }
 
 func (m *Master) handleRegister(w http.ResponseWriter, r *http.Request) {
@@ -249,17 +249,6 @@ func (m *Master) handleHeartbeat(w http.ResponseWriter, r *http.Request) {
 	}
 	m.mu.Unlock()
 	w.WriteHeader(http.StatusOK)
-}
-
-func (m *Master) slaveListData() map[string]any {
-	m.mu.RLock()
-	defer m.mu.RUnlock()
-	list := make([]*shared.SlaveInfo, 0, len(m.slaves))
-	for _, s := range m.slaves {
-		list = append(list, s)
-	}
-	sort.Slice(list, func(i, j int) bool { return list[i].Name < list[j].Name })
-	return map[string]any{"Slaves": list}
 }
 
 // staticFS placeholder, replaced in templates.go.

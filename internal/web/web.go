@@ -2,12 +2,8 @@ package web
 
 import "embed"
 
-// TemplatesFS contains the HTML templates used by the master UI.
-//
-//go:embed templates/*.html
-var TemplatesFS embed.FS
-
-// StaticFS contains static assets (CSS, JS).
+// StaticFS contains the built React SPA assets.
 //
 //go:embed static/*
+//go:embed static/assets/*
 var StaticFS embed.FS

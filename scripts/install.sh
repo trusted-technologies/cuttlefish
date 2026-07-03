@@ -338,7 +338,7 @@ install_slave() {
 
     mkdir -p "$INSTALL_DIR"
 
-    local master_url token slave_id slave_name location ipv4 ipv6 public_url iperf_port files_sizes
+    local master_url token slave_id slave_name location ipv4 ipv6 public_url iperf_port files_sizes stats_interfaces
     master_url=$(ask "Enter master URL (e.g. https://lg.example.com)")
     token=$(ask "Enter MASTER_TOKEN")
     slave_id=$(ask "Slave ID" "$(hostname -f 2>/dev/null || hostname)")
@@ -360,6 +360,7 @@ install_slave() {
     public_port=$(parse_url_port "$public_url" 8080)
     iperf_port=$(ask "iPerf3 server port" "5201")
     files_sizes=$(ask "Test file sizes (comma-separated, empty for all)" "")
+    stats_interfaces=$(ask "Network interfaces to monitor (comma-separated, empty for auto)" "")
 
     cat > "$ENV_FILE" <<EOF
 CUTTLEFISH_ROLE="slave"
@@ -373,6 +374,7 @@ SLAVE_IPV6="${ipv6}"
 SLAVE_LOCATION="${location}"
 IPERF_PORT="${iperf_port}"
 FILES_SIZES="${files_sizes}"
+STATS_INTERFACES="${stats_interfaces}"
 FILES_DIR="/data/files"
 EOF
 
@@ -399,6 +401,7 @@ services:
       SLAVE_ADDR: ":8080"
       IPERF_PORT: "${iperf_port}"
       FILES_SIZES: "${files_sizes}"
+      STATS_INTERFACES: "${stats_interfaces}"
       FILES_DIR: "/data/files"
     volumes:
       - cuttlefish-slave-files:/data/files

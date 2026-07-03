@@ -32,6 +32,8 @@ services:
       FILES_DIR: "/data/files"
       # Optional: limit test file sizes, e.g. "1M,10M,100M,1G"
       FILES_SIZES: "${FILES_SIZES:-}"
+      # Optional: interfaces to monitor for traffic charts, e.g. "eth0,ens18"
+      STATS_INTERFACES: "${STATS_INTERFACES:-}"
     cap_add:
       - NET_RAW
     networks:

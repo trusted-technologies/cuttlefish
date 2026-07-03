@@ -167,6 +167,8 @@ docker run -d \
   -e SLAVE_LOCATION="Amsterdam, NL" \
   -e SLAVE_ADDR=":8080" \
   -e IPERF_PORT="5201" \
+  -e FILES_SIZES="1M,10M,100M,1G,10G,100G" \
+  -e STATS_INTERFACES="eth0" \
   -e FILES_DIR="/data/files" \
   ghcr.io/trusted-technologies/cuttlefish-slave:main
 ```
@@ -244,6 +246,7 @@ Only the listed sizes are created on disk and shown in the UI.
 | `IPERF_PORT`       | iperf3 server port                          | `5201`        |
 | `FILES_DIR`        | Directory for test files                    | `/data/files` |
 | `FILES_SIZES`      | Comma-separated test file sizes to serve    | `1M,10M,...`  |
+| `STATS_INTERFACES` | Comma-separated interfaces to chart traffic | auto          |
 
 ## Building from source
 
