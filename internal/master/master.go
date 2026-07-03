@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/fs"
 	"log/slog"
+	"mime"
 	"net/http"
 	"sort"
 	"strings"
@@ -16,6 +17,10 @@ import (
 
 	"github.com/trusted-technologies/cuttlefish/internal/shared"
 )
+
+func init() {
+	_ = mime.AddExtensionType(".css", "text/css; charset=utf-8")
+}
 
 // Config holds master configuration.
 type Config struct {
