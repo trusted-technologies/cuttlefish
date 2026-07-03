@@ -4,6 +4,14 @@ set -e
 # Cuttlefish interactive installer.
 # Supports: master install, slave install, update, reinstall, uninstall.
 
+if [[ ! -t 0 ]]; then
+    echo "This installer is interactive. Do not pipe it directly into bash." >&2
+    echo "Run:" >&2
+    echo "  curl -sSL https://raw.githubusercontent.com/trusted-technologies/cuttlefish/main/scripts/install.sh -o /tmp/cuttlefish-install.sh" >&2
+    echo "  sudo bash /tmp/cuttlefish-install.sh" >&2
+    exit 1
+fi
+
 INSTALL_DIR="/opt/cuttlefish"
 ENV_FILE="${INSTALL_DIR}/.env"
 COMPOSE_FILE="${INSTALL_DIR}/docker-compose.yml"
@@ -232,6 +240,10 @@ install_master() {
 
     local domain port token use_nginx ssl_choice
     domain=$(ask "Enter domain for the Looking Glass (e.g. lg.example.com)")
+    if [[ -z $domain ]]; then
+        err "Domain cannot be empty."
+        exit 1
+    fi
     port=$(ask "Internal master port" "8080")
     token=$(generate_token)
 

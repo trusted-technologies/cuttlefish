@@ -31,10 +31,11 @@ cd cuttlefish/scripts
 sudo bash install.sh
 ```
 
-Or download just the installer:
+Or download just the installer (the installer is interactive, so do not pipe it directly):
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/trusted-technologies/cuttlefish/main/scripts/install.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/trusted-technologies/cuttlefish/main/scripts/install.sh -o /tmp/cuttlefish-install.sh
+sudo bash /tmp/cuttlefish-install.sh
 ```
 
 ### What the installer does
