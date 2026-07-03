@@ -17,14 +17,12 @@ services:
       context: .
       dockerfile: Dockerfile.slave
     container_name: cuttlefish-slave
-    ports:
-      - "8080:8080"
-      - "5201:5201"
+    network_mode: host
     environment:
       SLAVE_ID: "local-slave"
       SLAVE_NAME: "Local Test Slave"
-      SLAVE_PUBLIC_URL: "http://slave:8080"
-      MASTER_URL: "http://master:8080"
+      SLAVE_PUBLIC_URL: "http://localhost:8080"
+      MASTER_URL: "http://localhost:8080"
       SLAVE_TOKEN: "${MASTER_TOKEN:-change-me-in-production}"
       SLAVE_LOCATION: "Docker local"
       SLAVE_ADDR: ":8080"
@@ -36,8 +34,6 @@ services:
       STATS_INTERFACES: "${STATS_INTERFACES:-}"
     cap_add:
       - NET_RAW
-    networks:
-      - cuttlefish
     depends_on:
       - master
 
