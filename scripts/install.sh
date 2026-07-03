@@ -3,12 +3,12 @@ set -e
 
 # Cuttlefish interactive installer.
 # Supports: master install, slave install, update, reinstall, uninstall.
+#
+# Prompts are read from /dev/tty so the script can be piped from curl and
+# still remain interactive.
 
-if [[ ! -t 0 ]]; then
-    echo "This installer is interactive. Do not pipe it directly into bash." >&2
-    echo "Run:" >&2
-    echo "  curl -sSL https://raw.githubusercontent.com/trusted-technologies/cuttlefish/main/scripts/install.sh -o /tmp/cuttlefish-install.sh" >&2
-    echo "  sudo bash /tmp/cuttlefish-install.sh" >&2
+if [[ ! -e /dev/tty ]]; then
+    echo "This installer requires a terminal (/dev/tty)." >&2
     exit 1
 fi
 
@@ -30,15 +30,23 @@ log() { echo -e "\033[1;34m[cuttlefish]\033[0m $*"; }
 warn() { echo -e "\033[1;33m[cuttlefish]\033[0m $*" >&2; }
 err() { echo -e "\033[1;31m[cuttlefish]\033[0m $*" >&2; }
 
+_read_tty() {
+    if [[ -t 0 ]]; then
+        read -r "$@"
+    else
+        read -r "$@" < /dev/tty
+    fi
+}
+
 ask() {
     local prompt="$1"
     local default="${2:-}"
     local value
     if [[ -n $default ]]; then
-        read -rp "${prompt} [${default}]: " value
+        _read_tty -p "${prompt} [${default}]: " value
         echo "${value:-$default}"
     else
-        read -rp "${prompt}: " value
+        _read_tty -p "${prompt}: " value
         echo "$value"
     fi
 }
@@ -48,7 +56,7 @@ ask_yesno() {
     local default="${2:-y}"
     local value
     while true; do
-        read -rp "${prompt} [${default}]: " value
+        _read_tty -p "${prompt} [${default}]: " value
         value="${value:-$default}"
         case "$value" in
             [Yy]|[Yy][Ee][Ss]) return 0 ;;
