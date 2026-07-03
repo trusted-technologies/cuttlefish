@@ -105,24 +105,34 @@ The slave must be reachable from the master (public IP or internal address in th
 export MASTER_TOKEN="<same token as the master>"
 export MASTER_URL="http://<master-ip>:8080"
 export SLAVE_PUBLIC_URL="http://<this-slave-ip>:8080"
+export SLAVE_IPV4="<this-slave-public-ipv4>"
+
+# Optional: set a public IPv6 if the node has one.
+# export SLAVE_IPV6="<this-slave-public-ipv6>"
 
 docker run -d \
   --name cuttlefish-slave \
   --restart unless-stopped \
   -p 8080:8080 \
+  -p 5201:5201 \
   --cap-add NET_RAW \
   -e SLAVE_ID="ams-01" \
   -e SLAVE_NAME="Amsterdam 01" \
   -e SLAVE_PUBLIC_URL="$SLAVE_PUBLIC_URL" \
+  -e SLAVE_IPV4="$SLAVE_IPV4" \
+  -e SLAVE_IPV6="$SLAVE_IPV6" \
   -e MASTER_URL="$MASTER_URL" \
   -e SLAVE_TOKEN="$MASTER_TOKEN" \
   -e SLAVE_LOCATION="Amsterdam, NL" \
   -e SLAVE_ADDR=":8080" \
+  -e IPERF_PORT="5201" \
   -e FILES_DIR="/data/files" \
   ghcr.io/trusted-technologies/cuttlefish-slave:main
 ```
 
 > **Important:** `SLAVE_PUBLIC_URL` is the address the master uses to reach the slave. If the master and slave are on the same Docker network, you can use the container name, e.g. `http://slave:8080`.
+>
+> The slave auto-detects its IP addresses, but inside Docker it usually sees the container IP (e.g. `172.17.0.2`). Set `SLAVE_IPV4`/`SLAVE_IPV6` to show the real public addresses in the UI.
 
 ### Docker Compose for the slave
 
@@ -134,16 +144,20 @@ services:
     restart: unless-stopped
     ports:
       - "8080:8080"
+      - "5201:5201"
     cap_add:
       - NET_RAW
     environment:
       SLAVE_ID: "ams-01"
       SLAVE_NAME: "Amsterdam 01"
       SLAVE_PUBLIC_URL: "http://<this-slave-ip>:8080"
+      SLAVE_IPV4: "<this-slave-public-ipv4>"
+      SLAVE_IPV6: "<this-slave-public-ipv6>"
       MASTER_URL: "http://<master-ip>:8080"
       SLAVE_TOKEN: "${MASTER_TOKEN}"
       SLAVE_LOCATION: "Amsterdam, NL"
       SLAVE_ADDR: ":8080"
+      IPERF_PORT: "5201"
       FILES_DIR: "/data/files"
 ```
 
@@ -168,10 +182,13 @@ docker compose up -d
 | `SLAVE_ID`         | Unique slave identifier                     | hostname      |
 | `SLAVE_NAME`       | Human-readable name                         | `SLAVE_ID`    |
 | `SLAVE_PUBLIC_URL` | URL the master uses to reach this slave     | —             |
+| `SLAVE_IPV4`       | Public IPv4 to show in the UI               | auto-detected |
+| `SLAVE_IPV6`       | Public IPv6 to show in the UI               | auto-detected |
 | `MASTER_URL`       | Master URL for registration                 | —             |
 | `SLAVE_TOKEN`      | Same token as `MASTER_TOKEN`                | —             |
 | `SLAVE_LOCATION`   | Location label                              | —             |
 | `SLAVE_ADDR`       | Listen address                              | `:8080`       |
+| `IPERF_PORT`       | iperf3 server port                          | `5201`        |
 | `FILES_DIR`        | Directory for test files                    | `/data/files` |
 
 ## Building from source

@@ -7,82 +7,102 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/static/style.css">
 </head>
-<body class="bg-neutral-50 text-neutral-900 min-h-screen">
-  <header class="border-b bg-white">
+<body class="bg-neutral-950 text-neutral-100 min-h-screen flex flex-col">
+  <header class="border-b border-neutral-800 bg-neutral-900">
     <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
       <a href="/" class="text-xl font-semibold tracking-tight">Cuttlefish</a>
-      <nav class="text-sm text-neutral-500">
-        <a href="/" class="hover:text-neutral-900">Slaves</a>
-      </nav>
     </div>
   </header>
-  <main class="max-w-6xl mx-auto px-4 py-8">
+  <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full">
     <div class="space-y-6">
       <div class="flex items-center gap-3">
-        <a href="/" class="text-sm text-neutral-500 hover:text-neutral-900">← Back</a>
+        <a href="/" class="text-sm text-neutral-400 hover:text-neutral-200">← Back</a>
       </div>
 
-      <div class="rounded-xl border bg-white p-6 shadow-sm">
-        <div class="flex items-start justify-between">
-          <div>
-            <h1 class="text-2xl font-bold">{{.Slave.Name}}</h1>
-            <p class="text-neutral-500">{{.Slave.Location}}</p>
-          </div>
-          <a href="{{.Slave.PublicURL}}" target="_blank" class="text-sm text-blue-600 hover:underline">Direct link</a>
+      <div class="rounded-xl border border-neutral-800 bg-neutral-900 p-6 shadow-sm">
+        <div>
+          <h1 class="text-2xl font-bold text-white">{{.Slave.Name}}</h1>
+          <p class="text-neutral-400">{{.Slave.Location}}</p>
         </div>
 
         <div class="mt-6 grid gap-4 md:grid-cols-2">
-          <div class="rounded-lg border p-4">
+          <div class="rounded-lg border border-neutral-800 bg-neutral-900/50 p-4">
             <p class="text-sm text-neutral-500">IPv4</p>
-            <div class="mt-1 flex items-center justify-between">
-              <code class="font-mono text-lg" id="slave-ipv4">{{.Slave.IPv4}}</code>
-              <button onclick="copy('slave-ipv4')" class="text-xs px-2 py-1 rounded border hover:bg-neutral-50">Copy</button>
+            <div class="mt-1 flex items-center justify-between gap-3">
+              <code class="font-mono text-lg text-neutral-100" id="slave-ipv4">{{.Slave.IPv4}}</code>
+              <button onclick="copy('slave-ipv4')" class="text-xs px-2 py-1 rounded border border-neutral-700 hover:bg-neutral-800 text-neutral-300">Copy</button>
             </div>
           </div>
-          <div class="rounded-lg border p-4">
+          {{if .Slave.IPv6}}
+          <div class="rounded-lg border border-neutral-800 bg-neutral-900/50 p-4">
             <p class="text-sm text-neutral-500">IPv6</p>
-            <div class="mt-1 flex items-center justify-between">
-              <code class="font-mono text-lg break-all" id="slave-ipv6">{{.Slave.IPv6}}</code>
-              <button onclick="copy('slave-ipv6')" class="text-xs px-2 py-1 rounded border hover:bg-neutral-50">Copy</button>
+            <div class="mt-1 flex items-center justify-between gap-3">
+              <code class="font-mono text-lg text-neutral-100 break-all" id="slave-ipv6">{{.Slave.IPv6}}</code>
+              <button onclick="copy('slave-ipv6')" class="text-xs px-2 py-1 rounded border border-neutral-700 hover:bg-neutral-800 text-neutral-300">Copy</button>
             </div>
           </div>
+          {{end}}
         </div>
       </div>
 
       <div class="grid gap-6 lg:grid-cols-2">
-        <div class="rounded-xl border bg-white p-6 shadow-sm space-y-4">
-          <h2 class="text-lg font-semibold">Network tools</h2>
+        <div class="rounded-xl border border-neutral-800 bg-neutral-900 p-6 shadow-sm space-y-4">
+          <h2 class="text-lg font-semibold text-white">Network tools</h2>
           <div class="flex flex-wrap gap-2">
-            <input type="text" id="target" placeholder="example.com" class="flex-1 min-w-[12rem] rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="ipv6" class="rounded"> IPv6</label>
+            <input type="text" id="target" placeholder="example.com" class="flex-1 min-w-[12rem] rounded-lg border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <label class="flex items-center gap-2 text-sm text-neutral-300"><input type="checkbox" id="ipv6" class="rounded border-neutral-700 bg-neutral-900"> IPv6</label>
           </div>
           <div class="flex flex-wrap gap-2">
-            <button onclick="runTool('ping')" class="px-4 py-2 rounded-lg bg-neutral-900 text-white text-sm hover:bg-neutral-800">Ping</button>
-            <button onclick="runTool('mtr')" class="px-4 py-2 rounded-lg bg-neutral-900 text-white text-sm hover:bg-neutral-800">MTR</button>
-            <button onclick="runTool('traceroute')" class="px-4 py-2 rounded-lg bg-neutral-900 text-white text-sm hover:bg-neutral-800">Traceroute</button>
-            <button onclick="runTool('iperf')" class="px-4 py-2 rounded-lg bg-neutral-900 text-white text-sm hover:bg-neutral-800">iPerf3</button>
+            <button onclick="runTool('ping')" class="px-4 py-2 rounded-lg bg-neutral-100 text-neutral-900 text-sm hover:bg-neutral-200">Ping</button>
+            <button onclick="runTool('mtr')" class="px-4 py-2 rounded-lg bg-neutral-100 text-neutral-900 text-sm hover:bg-neutral-200">MTR</button>
+            <button onclick="runTool('traceroute')" class="px-4 py-2 rounded-lg bg-neutral-100 text-neutral-900 text-sm hover:bg-neutral-200">Traceroute</button>
+            <button onclick="runTool('iperf')" class="px-4 py-2 rounded-lg bg-neutral-100 text-neutral-900 text-sm hover:bg-neutral-200">iPerf3 to target</button>
           </div>
-          <pre id="tool-output" class="rounded-lg bg-neutral-950 text-neutral-100 p-4 text-sm h-80 overflow-auto font-mono whitespace-pre-wrap"></pre>
+          <pre id="tool-output" class="rounded-lg bg-black text-green-400 border border-neutral-800 p-4 text-sm h-80 overflow-auto font-mono whitespace-pre-wrap"></pre>
         </div>
 
-        <div class="rounded-xl border bg-white p-6 shadow-sm space-y-4">
-          <h2 class="text-lg font-semibold">Speed test files</h2>
-          <p class="text-sm text-neutral-500">Download test files served directly by this slave.</p>
-          <div class="grid grid-cols-2 gap-3">
-            {{range .Files}}
-            <a href="{{.URL}}" class="flex items-center justify-between rounded-lg border px-4 py-3 hover:bg-neutral-50">
-              <span class="font-mono text-sm">{{.Name}}</span>
-              <span class="text-xs text-neutral-500">{{.Size}}</span>
-            </a>
-            {{end}}
+        <div class="space-y-6">
+          <div class="rounded-xl border border-neutral-800 bg-neutral-900 p-6 shadow-sm space-y-4">
+            <h2 class="text-lg font-semibold text-white">Speed test files</h2>
+            <p class="text-sm text-neutral-400">Download test files served directly by this slave.</p>
+            <div class="grid grid-cols-2 gap-3">
+              {{range .Files}}
+              <a href="{{.URL}}" class="flex items-center justify-between rounded-lg border border-neutral-800 bg-neutral-900/50 px-4 py-3 hover:bg-neutral-800">
+                <span class="font-mono text-sm text-neutral-200">{{.Name}}</span>
+                <span class="text-xs text-neutral-500">{{.Size}}</span>
+              </a>
+              {{end}}
+            </div>
           </div>
 
-          <div class="rounded-xl border bg-white p-6 shadow-sm space-y-4 mt-6">
-            <h2 class="text-lg font-semibold">Your IP</h2>
-            <div id="myip" class="space-y-2 text-sm">
-              <p><span class="text-neutral-500">IPv4</span> <span class="font-mono" id="my-ipv4">—</span></p>
-              <p><span class="text-neutral-500">IPv6</span> <span class="font-mono" id="my-ipv6">—</span></p>
+          <div class="rounded-xl border border-neutral-800 bg-neutral-900 p-6 shadow-sm space-y-4">
+            <h2 class="text-lg font-semibold text-white">iPerf3 to this node</h2>
+            <p class="text-sm text-neutral-400">Run these from your machine against this node.</p>
+            <div class="space-y-3">
+              {{if .Slave.IPv4}}
+              <div>
+                <p class="text-xs text-neutral-500 mb-1">IPv4</p>
+                <div class="flex items-center justify-between gap-3 rounded-lg border border-neutral-800 bg-black p-3">
+                  <code class="font-mono text-sm text-green-400 break-all" id="iperf-ipv4">iperf3 -4 -c {{.Slave.IPv4}} -p {{.Slave.IperfPort}} -P 4</code>
+                  <button onclick="copy('iperf-ipv4')" class="text-xs px-2 py-1 rounded border border-neutral-700 hover:bg-neutral-800 text-neutral-300 shrink-0">Copy</button>
+                </div>
+              </div>
+              {{end}}
+              {{if .Slave.IPv6}}
+              <div>
+                <p class="text-xs text-neutral-500 mb-1">IPv6</p>
+                <div class="flex items-center justify-between gap-3 rounded-lg border border-neutral-800 bg-black p-3">
+                  <code class="font-mono text-sm text-green-400 break-all" id="iperf-ipv6">iperf3 -6 -c {{.Slave.IPv6}} -p {{.Slave.IperfPort}} -P 4</code>
+                  <button onclick="copy('iperf-ipv6')" class="text-xs px-2 py-1 rounded border border-neutral-700 hover:bg-neutral-800 text-neutral-300 shrink-0">Copy</button>
+                </div>
+              </div>
+              {{end}}
             </div>
+          </div>
+
+          <div id="myip-card" class="rounded-xl border border-neutral-800 bg-neutral-900 p-6 shadow-sm space-y-4 hidden">
+            <h2 class="text-lg font-semibold text-white">Your IP</h2>
+            <div id="myip" class="space-y-2 text-sm"></div>
           </div>
         </div>
       </div>
@@ -126,14 +146,21 @@
     fetch('/api/myip')
       .then(r => r.json())
       .then(data => {
-        if (data.ipv4) document.getElementById('my-ipv4').textContent = data.ipv4;
-        if (data.ipv6) document.getElementById('my-ipv6').textContent = data.ipv6;
+        const container = document.getElementById('myip');
+        const card = document.getElementById('myip-card');
+        const parts = [];
+        if (data.ipv4) parts.push(`<p><span class="text-neutral-500">IPv4</span> <span class="font-mono text-neutral-200">${data.ipv4}</span></p>`);
+        if (data.ipv6) parts.push(`<p><span class="text-neutral-500">IPv6</span> <span class="font-mono text-neutral-200">${data.ipv6}</span></p>`);
+        if (parts.length) {
+          container.innerHTML = parts.join('');
+          card.classList.remove('hidden');
+        }
       });
     </script>
   </main>
-  <footer class="border-t bg-white mt-auto">
-    <div class="max-w-6xl mx-auto px-4 py-6 text-sm text-neutral-500">
-      Open-source Looking Glass · <a href="https://github.com/trusted-technologies/cuttlefish" class="underline hover:text-neutral-900">GitHub</a>
+  <footer class="border-t border-neutral-800 bg-neutral-900 mt-auto">
+    <div class="max-w-6xl mx-auto px-4 py-6 text-sm text-neutral-400">
+      Open-source Looking Glass · <a href="https://github.com/trusted-technologies/cuttlefish" class="underline hover:text-neutral-200">GitHub</a>
     </div>
   </footer>
 </body>

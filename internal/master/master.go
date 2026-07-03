@@ -207,6 +207,10 @@ func (m *Master) handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	m.mu.Lock()
+	iperfPort := req.IperfPort
+	if iperfPort == "" {
+		iperfPort = "5201"
+	}
 	m.slaves[req.ID] = &shared.SlaveInfo{
 		ID:        req.ID,
 		Name:      req.Name,
@@ -214,6 +218,7 @@ func (m *Master) handleRegister(w http.ResponseWriter, r *http.Request) {
 		IPv4:      req.IPv4,
 		IPv6:      req.IPv6,
 		Location:  req.Location,
+		IperfPort: iperfPort,
 		LastSeen:  time.Now(),
 	}
 	m.mu.Unlock()

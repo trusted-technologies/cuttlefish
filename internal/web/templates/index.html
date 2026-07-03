@@ -7,48 +7,45 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/static/style.css">
 </head>
-<body class="bg-neutral-50 text-neutral-900 min-h-screen">
-  <header class="border-b bg-white">
+<body class="bg-neutral-950 text-neutral-100 min-h-screen flex flex-col">
+  <header class="border-b border-neutral-800 bg-neutral-900">
     <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
       <a href="/" class="text-xl font-semibold tracking-tight">Cuttlefish</a>
-      <nav class="text-sm text-neutral-500">
-        <a href="/" class="hover:text-neutral-900">Slaves</a>
-      </nav>
     </div>
   </header>
-  <main class="max-w-6xl mx-auto px-4 py-8">
+  <main class="max-w-6xl mx-auto px-4 py-8 flex-grow w-full">
     <div class="space-y-6">
       <div class="flex items-center justify-between">
         <h1 class="text-3xl font-bold">Network nodes</h1>
-        <span class="text-sm text-neutral-500">{{len .Slaves}} registered</span>
+        <span class="text-sm text-neutral-400">{{len .Slaves}} registered</span>
       </div>
 
       <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3" id="slave-grid">
         {{range .Slaves}}
-        <a href="/slave/{{.ID}}" class="block rounded-xl border bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
+        <a href="/slave/{{.ID}}" class="block rounded-xl border border-neutral-800 bg-neutral-900 p-5 shadow-sm hover:border-neutral-700 transition-colors">
           <div class="flex items-start justify-between">
             <div>
-              <h2 class="font-semibold text-lg">{{.Name}}</h2>
-              <p class="text-sm text-neutral-500">{{.Location}}</p>
+              <h2 class="font-semibold text-lg text-white">{{.Name}}</h2>
+              <p class="text-sm text-neutral-400">{{.Location}}</p>
             </div>
             <span class="inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
           </div>
           <div class="mt-4 space-y-1 text-sm">
-            {{if .IPv4}}<p><span class="text-neutral-400">IPv4</span> <span class="font-mono ml-1">{{.IPv4}}</span></p>{{end}}
-            {{if .IPv6}}<p><span class="text-neutral-400">IPv6</span> <span class="font-mono ml-1">{{.IPv6}}</span></p>{{end}}
+            {{if .IPv4}}<p><span class="text-neutral-500">IPv4</span> <span class="font-mono ml-1 text-neutral-200">{{.IPv4}}</span></p>{{end}}
+            {{if .IPv6}}<p><span class="text-neutral-500">IPv6</span> <span class="font-mono ml-1 text-neutral-200">{{.IPv6}}</span></p>{{end}}
           </div>
         </a>
         {{else}}
-        <div class="col-span-full rounded-xl border border-dashed bg-white p-10 text-center text-neutral-500">
-          No slaves registered yet. Start a slave with the same <code class="bg-neutral-100 px-1 rounded">MASTER_TOKEN</code> and point it to this master.
+        <div class="col-span-full rounded-xl border border-dashed border-neutral-700 bg-neutral-900 p-10 text-center text-neutral-400">
+          No slaves registered yet. Start a slave with the same <code class="bg-neutral-800 px-1 rounded text-neutral-200">MASTER_TOKEN</code> and point it to this master.
         </div>
         {{end}}
       </div>
     </div>
   </main>
-  <footer class="border-t bg-white mt-auto">
-    <div class="max-w-6xl mx-auto px-4 py-6 text-sm text-neutral-500">
-      Open-source Looking Glass · <a href="https://github.com/trusted-technologies/cuttlefish" class="underline hover:text-neutral-900">GitHub</a>
+  <footer class="border-t border-neutral-800 bg-neutral-900 mt-auto">
+    <div class="max-w-6xl mx-auto px-4 py-6 text-sm text-neutral-400">
+      Open-source Looking Glass · <a href="https://github.com/trusted-technologies/cuttlefish" class="underline hover:text-neutral-200">GitHub</a>
     </div>
   </footer>
 </body>

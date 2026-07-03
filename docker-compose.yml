@@ -17,6 +17,9 @@ services:
       context: .
       dockerfile: Dockerfile.slave
     container_name: cuttlefish-slave
+    ports:
+      - "8080:8080"
+      - "5201:5201"
     environment:
       SLAVE_ID: "local-slave"
       SLAVE_NAME: "Local Test Slave"
@@ -25,6 +28,7 @@ services:
       SLAVE_TOKEN: "${MASTER_TOKEN:-change-me-in-production}"
       SLAVE_LOCATION: "Docker local"
       SLAVE_ADDR: ":8080"
+      IPERF_PORT: "5201"
       FILES_DIR: "/data/files"
     cap_add:
       - NET_RAW

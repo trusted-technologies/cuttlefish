@@ -4,13 +4,14 @@ import "time"
 
 // SlaveInfo describes a registered slave node.
 type SlaveInfo struct {
-	ID        string     `json:"id"`
-	Name      string     `json:"name"`
-	PublicURL string     `json:"public_url"`
-	IPv4      string     `json:"ipv4"`
-	IPv6      string     `json:"ipv6"`
-	Location  string     `json:"location"`
-	LastSeen  time.Time  `json:"last_seen"`
+	ID        string    `json:"id"`
+	Name      string    `json:"name"`
+	PublicURL string    `json:"public_url"`
+	IPv4      string    `json:"ipv4"`
+	IPv6      string    `json:"ipv6"`
+	Location  string    `json:"location"`
+	IperfPort string    `json:"iperf_port"`
+	LastSeen  time.Time `json:"last_seen"`
 }
 
 // CommandRequest is sent from master to slave to start a network tool.
@@ -43,6 +44,7 @@ type RegisterRequest struct {
 	IPv4      string `json:"ipv4"`
 	IPv6      string `json:"ipv6"`
 	Location  string `json:"location"`
+	IperfPort string `json:"iperf_port"`
 }
 
 // HeartbeatRequest is sent periodically by a slave.

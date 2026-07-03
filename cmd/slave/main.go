@@ -17,10 +17,13 @@ func main() {
 	flag.StringVar(&cfg.ID, "id", shared.EnvDefault("SLAVE_ID", ""), "unique slave id")
 	flag.StringVar(&cfg.Name, "name", shared.EnvDefault("SLAVE_NAME", ""), "human readable name")
 	flag.StringVar(&cfg.PublicURL, "public-url", shared.EnvDefault("SLAVE_PUBLIC_URL", ""), "publicly reachable URL of this slave")
+	flag.StringVar(&cfg.IPv4, "ipv4", shared.EnvDefault("SLAVE_IPV4", ""), "public IPv4 address (overrides auto-detection)")
+	flag.StringVar(&cfg.IPv6, "ipv6", shared.EnvDefault("SLAVE_IPV6", ""), "public IPv6 address (overrides auto-detection)")
 	flag.StringVar(&cfg.MasterURL, "master-url", shared.EnvDefault("MASTER_URL", ""), "master registration URL")
 	flag.StringVar(&cfg.Token, "token", shared.EnvDefault("SLAVE_TOKEN", ""), "shared secret with master")
 	flag.StringVar(&cfg.Location, "location", shared.EnvDefault("SLAVE_LOCATION", ""), "location label")
 	flag.StringVar(&cfg.HTTPAddr, "addr", shared.EnvDefault("SLAVE_ADDR", ":8080"), "HTTP listen address")
+	flag.StringVar(&cfg.IperfPort, "iperf-port", shared.EnvDefault("IPERF_PORT", "5201"), "iperf3 server port")
 	flag.StringVar(&cfg.FilesDir, "files-dir", shared.EnvDefault("FILES_DIR", "/data/files"), "directory for test files")
 	flag.Parse()
 

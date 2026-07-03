@@ -22,6 +22,6 @@ RUN setcap cap_net_raw+ep /usr/bin/ping || true && \
 
 RUN mkdir -p /data/files
 COPY --from=builder /bin/slave /usr/local/bin/cuttlefish-slave
-EXPOSE 8080
+EXPOSE 8080 5201
 VOLUME ["/data/files"]
 ENTRYPOINT ["/usr/local/bin/cuttlefish-slave"]

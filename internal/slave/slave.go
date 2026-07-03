@@ -17,10 +17,13 @@ type Config struct {
 	ID        string
 	Name      string
 	PublicURL string
+	IPv4      string
+	IPv6      string
 	MasterURL string
 	Token     string
 	Location  string
 	HTTPAddr  string
+	IperfPort string
 	FilesDir  string
 }
 
@@ -60,6 +63,7 @@ func (s *Slave) Run(ctx context.Context) error {
 		}
 		go s.heartbeatLoop(ctx)
 	}
+	go startIperfServer(ctx, s.cfg.IperfPort)
 
 	errCh := make(chan error, 1)
 	go func() {
@@ -84,7 +88,7 @@ func (s *Slave) handleHealth(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Slave) handleInfo(w http.ResponseWriter, r *http.Request) {
-	ipv4, ipv6, _ := shared.DetectIPs()
+	ipv4, ipv6 := s.getIPs()
 	info := struct {
 		ID       string `json:"id"`
 		Name     string `json:"name"`
@@ -109,11 +113,20 @@ func (s *Slave) handleFiles(w http.ResponseWriter, r *http.Request) {
 	ServeFile(w, r, sizeName, s.cfg.FilesDir)
 }
 
-func (s *Slave) register(ctx context.Context) error {
+// getIPs returns the configured public IPs or auto-detected ones.
+func (s *Slave) getIPs() (string, string) {
+	if s.cfg.IPv4 != "" || s.cfg.IPv6 != "" {
+		return s.cfg.IPv4, s.cfg.IPv6
+	}
 	ipv4, ipv6, err := shared.DetectIPs()
 	if err != nil {
-		return err
+		slog.Warn("failed to detect IPs", "error", err)
 	}
+	return ipv4, ipv6
+}
+
+func (s *Slave) register(ctx context.Context) error {
+	ipv4, ipv6 := s.getIPs()
 	reqBody := shared.RegisterRequest{
 		ID:        s.cfg.ID,
 		Name:      s.cfg.Name,
@@ -122,6 +135,7 @@ func (s *Slave) register(ctx context.Context) error {
 		IPv4:      ipv4,
 		IPv6:      ipv6,
 		Location:  s.cfg.Location,
+		IperfPort: s.cfg.IperfPort,
 	}
 	return s.postJSON(ctx, s.cfg.MasterURL+"/internal/register", reqBody)
 }
@@ -134,7 +148,7 @@ func (s *Slave) heartbeatLoop(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			ipv4, ipv6, _ := shared.DetectIPs()
+			ipv4, ipv6 := s.getIPs()
 			req := shared.HeartbeatRequest{
 				ID:    s.cfg.ID,
 				Token: s.cfg.Token,
