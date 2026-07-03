@@ -63,7 +63,7 @@
         </div>
       </div>
 
-      <div class="grid gap-6 lg:grid-cols-2">
+      <div class="grid gap-6 lg:grid-cols-2 items-start">
         <div class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 space-y-4">
           <h2 class="text-xl font-bold text-gray-900 dark:text-white">Network tools</h2>
           <div class="flex flex-wrap gap-3">
@@ -163,7 +163,8 @@
       }
       const out = document.getElementById('tool-output');
       out.textContent = `Running ${tool} ${target}...\n`;
-      const ipv6 = document.getElementById('ipv6').checked;
+      const ipv6El = document.getElementById('ipv6');
+      const ipv6 = ipv6El ? ipv6El.checked : false;
       const params = new URLSearchParams({target, count: '4', timeout: '30'});
       if (ipv6) params.set('ipv6', 'true');
       const es = new EventSource('/api/slaves/' + slaveId + '/' + tool + '?' + params.toString());
