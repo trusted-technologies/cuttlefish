@@ -61,9 +61,7 @@ func (s *Slave) Run(ctx context.Context) error {
 	}
 
 	if s.cfg.MasterURL != "" {
-		if err := s.register(ctx); err != nil {
-			slog.Warn("failed to register with master", "error", err)
-		}
+		go s.registerLoop(ctx)
 		go s.heartbeatLoop(ctx)
 	}
 	go startIperfServer(ctx, s.cfg.IperfPort)
@@ -142,6 +140,22 @@ func (s *Slave) register(ctx context.Context) error {
 		FileSizes: s.cfg.FileSizes,
 	}
 	return s.postJSON(ctx, s.cfg.MasterURL+"/internal/register", reqBody)
+}
+
+func (s *Slave) registerLoop(ctx context.Context) {
+	for {
+		if err := s.register(ctx); err != nil {
+			slog.Warn("failed to register with master, retrying", "error", err)
+		} else {
+			slog.Info("registered with master")
+			return
+		}
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(5 * time.Second):
+		}
+	}
 }
 
 func (s *Slave) heartbeatLoop(ctx context.Context) {
