@@ -156,7 +156,12 @@ func (s *Slave) heartbeatLoop(ctx context.Context) {
 				IPv6:  ipv6,
 			}
 			if err := s.postJSON(ctx, s.cfg.MasterURL+"/internal/heartbeat", req); err != nil {
-				slog.Warn("heartbeat failed", "error", err)
+				slog.Warn("heartbeat failed, attempting to re-register", "error", err)
+				if regErr := s.register(ctx); regErr != nil {
+					slog.Warn("re-registration failed", "error", regErr)
+				} else {
+					slog.Info("re-registered with master")
+				}
 			}
 		}
 	}
