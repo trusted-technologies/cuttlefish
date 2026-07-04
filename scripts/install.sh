@@ -394,9 +394,7 @@ services:
     image: ${SLAVE_IMAGE}
     container_name: cuttlefish-slave
     restart: unless-stopped
-    ports:
-      - "${public_port}:8080"
-      - "${iperf_port}:${iperf_port}"
+    network_mode: host
     cap_add:
       - NET_RAW
     environment:
